@@ -3,16 +3,21 @@ package com.cos.blog.test;
 import java.util.List;
 import java.util.function.Supplier;
 
+import javax.transaction.Transactional;
 import javax.websocket.server.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cos.blog.model.RoleType;
@@ -25,17 +30,51 @@ public class DummyControllerTest {
 	@Autowired		// DummyControllerTest가 메모리에 뜰때 Autowired로 인해 메모리에 같이 뜬다.
 							// 이행위가 의존성 주입 (DI) 기능이다.
 	private UserRepository userRepository;
+	@DeleteMapping("/dummy/user/{id}")
+	public String deleteUser(@PathVariable int id) {
+		try {
+			userRepository.deleteById(id);
+		}catch(EmptyResultDataAccessException e) {			// 잘모르겠으면 Excetion e 로  선언해도 가능하다.
+			return "삭제에 실패하였습니다. 해당 id "+ id + "가 없습니다.";
+		}
+		return "삭제 되었습니다. id : " + id;
+	}
 	
-	@GetMapping("/dummy/user")
+	@Transactional		// 함수종료시 자동 commit  : save를 하지 않아도 update가 되는 @  : 더티 체킹
+	@PutMapping("/dummy/user/{id}")
+	private User updateUser(@PathVariable int id, @RequestBody User requestUser) {
+																		// Json 데이터로 보내도 spring이 자바 오브젝트로 변환해준다 MessageConverter가
+		System.out.println("id : " + id);
+		System.out.println("password : " + requestUser.getPassword());
+		System.out.println("email : " + requestUser.getEmail());
+		
+		// 검색해서 찾아온 유저를 user 객체에 저장한다면 가지고 있는 모든 값이 들어간다. 이후 
+		User user = userRepository.findById(id).orElseThrow(()->{
+			return new IllegalArgumentException("수정에 실패하였습니다.");
+		});
+		// 받아온 data를  set() 해준다. 
+		user.setPassword(requestUser.getPassword());	// user객체가 영속화가 되어있어서 함수가 종료되는시점에서 update가 일어난다.
+		user.setEmail(requestUser.getEmail()); 				// Transactional때문에 가능 :: 더티 체킹이라 한다.
+		// userRepository.save(user);		// .save는 insert용이지만 id 값이있다면 그걸 업뎃한다.
+													//user를 찾아서 user객체에 넣어서 저장하지않으면 나머지 데이터는 null이 되기에 꼭 찾아서 객체를 호출해줘야한다.
+		return user;		
+	}
+	
+	@GetMapping("/dummy/users")
 	public List<User> list(){
 		return userRepository.findAll();
 	}
 	// 한페이지당 2개의 데이터 받아오기 연습   :: Springboot 에서 page을 찾아서 사용하면된다. 직접만들지않아도 됨
-	@GetMapping("/dummy/user/page")
-	public Page<User> pageList(@PageableDefault(size=2,sort="id",direction = Sort.Direction.DESC) Pageable pageable){
-		Page<User> users = userRepository.findAll(pageable);
-		return users;
-		
+	@GetMapping("/dummy/user")
+	// Paging 정보와 db정보를 다가져올경우  // db정보만 가져오려면 아래쪽
+	//	public Page<User> pageList(@PageableDefault(size=2,sort="id",direction = Sort.Direction.DESC) Pageable pageable){
+//		Page<User> users = userRepository.findAll(pageable);
+//		return users;	
+//	}
+	public List<User> pageList(@PageableDefault(size=2,sort="id",direction = Sort.Direction.DESC) Pageable pageable){
+		Page<User> pagingUser = userRepository.findAll(pageable);
+		List<User> users = pagingUser.getContent();
+		return users;	
 	}
 	
 	// {id} 주소로 파라메터를 전달 받을수 있다.
