@@ -19,13 +19,10 @@
 	<dependencies>
 	<!-- 추가 라이브러리 -->
 	<!-- 시큐리티 태그 라이브러리 -->
-	<!--
 	<dependency>
 	  <groupId>org.springframework.security</groupId>
 	  <artifactId>spring-security-taglibs</artifactId>
-	</dependency>
-	-->
-	
+	</dependency>	
 	<!-- spring boot 에선  thymeleaf/mustathe 템플릿 사용이 기본이라 jsp는 지원하지 않는다. -->
 	<!-- 따로 폴더를 구성해야하고 그걸 읽으려면  밑에 템플릿 엔진이 필요하다-->
 	<!-- JSP 템플릿 엔진 :: jsp파일을 읽어오기 위함 -->
@@ -47,12 +44,12 @@
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 		
-		<!--
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-		-->
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
