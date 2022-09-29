@@ -38,7 +38,7 @@ public class Board {
 	private String title;
 	@Lob		// 대용량 데이터 사용 @
 	private String content; 	// 섬머노트 라이버리사용 (디자인된글) <html> 태그가 적용된 디자인
-	@ColumnDefault("0")
+	//@ColumnDefault("0")
 	private int count;	// 조회수
 	
 	
