@@ -31,7 +31,7 @@ public class User {
 		@Id
 		@GeneratedValue(strategy = GenerationType.IDENTITY)		// 프로젝트에서 연결된 DM의 넘버링 전략을 사용하겠다. PK로 유용
 		private int id; 	// 오라클연결시 시퀀스 / MYSQL 사용시 auto_increment   :: yml파일에서 use-new-id-generator-mappings: false 선언이 jpa를 따르지않겠다는 의미
-		@Column(nullable=false,length=30,unique = true )		// 값이 null 이면 안되도록 설정 길이는 30
+		@Column(nullable=false,length=100,unique = true )		// 값이 null 이면 안되도록 설정 길이는 30
 		private String username;		// id
 		@Column(nullable=false,length=100)	// pw 추후 해쉬로 변경해서 암호화할것이라 100까지 설정
 		private String password;
@@ -42,6 +42,7 @@ public class User {
 		@Enumerated(EnumType.STRING)// DB에선 RoleType 은 없기때문에 선언해준 @
 		private RoleType role;		//enum type을 사용하려했지만? ADMIN or USER
 		
+		private String oauth; 	// 로그인 방식 정보
 		@CreationTimestamp		// 시간이 자동 입력 db에 저장될때 적용됨
 		private Timestamp createDate; 	// java sql이 가진걸 호출
 }

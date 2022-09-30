@@ -22,6 +22,14 @@ public class UserService {
 	@Autowired
 	private BCryptPasswordEncoder encoder;
 
+	@Transactional(readOnly = true)
+	public User 회원찾기(String username) {
+		User user = userRepository.findByUsername(username).orElseGet(() -> {
+			return new User();
+		});
+		return user;
+	}
+
 	@Transactional
 	public void 회원가입(User user) {
 		String rawPassword = user.getPassword(); // user가 설정한 비밀번호
@@ -33,16 +41,23 @@ public class UserService {
 
 	@Transactional
 	public void 회원수정(User requestUser) {
-		// 수정시 영속성 컨텍스트 User 오프젝트를 영속화시키고 영속화된 User 오브젝트를 DB에서 가져오면 영속화 되고 함수가 종료되면 자동으로 DB update가 된다.
+		// 수정시 영속성 컨텍스트 User 오프젝트를 영속화시키고 영속화된 User 오브젝트를 DB에서 가져오면 영속화 되고 함수가 종료되면 자동으로
+		// DB update가 된다.
 		User persistance = userRepository.findById(requestUser.getId()).orElseThrow(() -> {
 			return new IllegalArgumentException("회원 찾기 실패");
 		});
-		String rawPassword = requestUser.getPassword(); // user가 설정한 비밀번호
-		String encPassword = encoder.encode(rawPassword); // 해쉬로 변경
-		persistance.setPassword(encPassword);
-		persistance.setEmail(requestUser.getEmail());
-		// 회원수정 종료시 ->서비스종료 = 트랜잭션 종료  DB update 자동 ( 자동 commit )		
-	}	
+
+		// ID( user.oauth ) 에 따른 수정제한 :: Validate 체크
+		if (persistance.getOauth() == null || persistance.getOauth().equals("")) {
+			String rawPassword = requestUser.getPassword(); // user가 설정한 비밀번호
+			String encPassword = encoder.encode(rawPassword); // 해쉬로 변경
+			persistance.setPassword(encPassword);
+			persistance.setEmail(requestUser.getEmail());
+		}
+
+		
+		// 회원수정 종료시 ->서비스종료 = 트랜잭션 종료 DB update 자동 ( 자동 commit )
+	}
 	/*
 	 * @Transactional(readOnly=true) // Select 할 때 트랜잭션 시작, 서비스 종료시에 트랜젝션 종료:: 이과정에
 	 * 정합성 유지를 선언 public User 로그인(User user) { return
