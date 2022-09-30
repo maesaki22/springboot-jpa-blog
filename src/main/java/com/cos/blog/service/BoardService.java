@@ -30,8 +30,30 @@ public class BoardService {
 		board.setUser(user);
 		boardRepository.save(board);
 	}
-	
+	@Transactional(readOnly = true)
 	public Page<Board>글목록(Pageable pageable) {
 		return boardRepository.findAll(pageable);
+	}
+	@Transactional(readOnly = true)
+	public Board 글상세보기(int id) {
+		return boardRepository.findById(id)
+				.orElseThrow(()->{
+					return new IllegalArgumentException("글 상세보기 실패.");
+				});
+	}
+	
+	@Transactional
+	public void 삭제하기(int id) {
+		boardRepository.deleteById(id);
+	}
+	@Transactional
+	public void 글수정하기(int id,Board requestBoard) {
+		Board board = boardRepository.findById(id)
+				.orElseThrow(()->{
+					return new IllegalArgumentException("글 찾기 실패");
+				}); 	// 영속화 
+		board.setTitle(requestBoard.getTitle());
+		board.setContent(requestBoard.getContent());
+		// 해당 함수로 종료시  트랜잭션이 종료됨 ->> 이순간 더티체킹이 일어나서 자동 업데이트가 일어남 DB flush
 	}
 }
