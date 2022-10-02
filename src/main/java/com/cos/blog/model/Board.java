@@ -50,7 +50,7 @@ public class Board {
 													// JoinColumn이 필요없는 것은 board는 replyid를 가지고 있을필요가없다 reply 가 boardid를 가지기때문에
 													// mappedBy="many쪽에 자신의 필드이름ex)board"
 													//FetchType.LAZY = 필요할때만 가져오는 방식  / EAGER = 무조곤사용할때 다가져오는방식 
-	private List<Reply> reply;	// 하나의 게시글엔 여러개의 댓글이 생길수 있다. 그래서 List를 사용
+	private List<Reply> replys;	// 하나의 게시글엔 여러개의 댓글이 생길수 있다. 그래서 List를 사용
 	
 	@CreationTimestamp		// date 가 생성되거나 업뎃될때마다 들어간다
 	private Timestamp createDate;
