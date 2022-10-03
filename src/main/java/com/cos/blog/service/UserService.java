@@ -18,7 +18,7 @@ import com.cos.blog.repository.UserRepository;
 public class UserService {
 
 	@Autowired // 의존성 주입 (DI) 기능이다.
-	public UserRepository userRepository;
+	private UserRepository userRepository;
 	@Autowired
 	private BCryptPasswordEncoder encoder;
 

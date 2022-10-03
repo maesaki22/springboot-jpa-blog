@@ -25,8 +25,12 @@ let index = {
 			dataType: "json" 		// 요청을 서버로해서 응답이 왔을 때 기본적으로 String(문자열)로 온다 (생긴게 json이라면) => javascript
 			// 생략해주면 ajax가  통신을 성공하고 서버가 json을 리턴하면 자동으로 자바 오브젝트로 변환해준다 (그래도 적어주자)
 		}).done(function(resp) {
-			alert("회원가입이 완료되었습니다.");
-			location.href = "/";
+			if(resp.status===500){
+			 	alert("회원가입이 실패하였습니다.");
+			} else {
+				alert("회원가입이 완료되었습니다.");
+				location.href = "/";	
+			}
 		}).fail(function(error) {
 			alert(JSON.stringify(error));
 		});	

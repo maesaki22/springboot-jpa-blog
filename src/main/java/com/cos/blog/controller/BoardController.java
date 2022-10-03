@@ -17,7 +17,7 @@ import com.cos.blog.service.BoardService;
 public class BoardController {
 	
 	@Autowired
-	public BoardService boardService;
+	private BoardService boardService;
 	
 	@GetMapping({"","/"})
 	//public String index(@AuthenticationPrincipal PrincipalDetail principal) {	// 로그인후 세션에 접근할수있는 @ :: 이건 따로 private @Autowied 로해도 에러발생
@@ -35,7 +35,7 @@ public class BoardController {
 	public String findById(@PathVariable int id,Model model) {
 		model.addAttribute("board",boardService.글상세보기(id));
 		return "board/detail";
-	}
+	} 
 	@GetMapping("/board/{id}/updateForm")
 	public String updateForm(@PathVariable int id,Model model) {
 		model.addAttribute("board",boardService.글상세보기(id));

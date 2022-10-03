@@ -9,6 +9,10 @@ let index = {
 		$("#btn-update").on("click", () => {
 			this.update();
 		});
+		$("#btn-reply-save").on("click", () => {
+			this.replySave();
+		});		
+		
 	},
 
 	save: function() {
@@ -67,6 +71,39 @@ let index = {
 			alert(JSON.stringify(error));
 		});
 	},
+	replySave: function() {
+		let data = {
+			userId: $("#userId").val(),
+			boardId: $("#boardId").val(),
+			content: $("#reply-content").val()
+		};
+		$.ajax({
+			type: "POST",
+			url: `/api/board/${data.boardId}/reply`,
+			data: JSON.stringify(data), 	// http body 데이터
+			contentType: "application/json; charset=utf-8", 	//body 데이터가 어떤 타입인지 (MIME)
+			dataType: "json" 		// 요청을 서버로해서 응답이 왔을 때 기본적으로 String(문자열)로 온다 (생긴게 json이라면) => javascript
+		}).done(function(resp) {
+			alert("댓글작성이 완료 되었습니다.");
+			location.href = `/board/${data.boardId}`;
+		}).fail(function(error) {
+			alert(JSON.stringify(error));
+		});
+	},	
+	replyDelete: function(boardId,replyId) {
+		$.ajax({
+			type: "DELETE",
+			url: `/api/board/${boardId}/reply/${replyId}`,
+			//data: JSON.stringify(data), 	// http body 넘어가는 데이타가없기때문에 지워도된다.
+			contentType: "application/json; charset=utf-8", 	//body 데이터가 어떤 타입인지 (MIME)
+			dataType: "json" 		// 요청을 서버로해서 응답이 왔을 때 기본적으로 String(문자열)로 온다 (생긴게 json이라면) => javascript
+		}).done(function(resp) {
+			alert("댓글삭제 성공");
+			location.href = `/board/${boardId}`;
+		}).fail(function(error) {
+			alert(JSON.stringify(error));
+		});
+	},	
 }
 
 index.init();

@@ -3,6 +3,7 @@ package com.cos.blog.model;
 import java.sql.Timestamp;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,9 +14,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,10 +50,13 @@ public class Board {
 	@JoinColumn(name="userId")
 	private User user;	// DB는 오브젝트 저장xx .. 자바는 오브젝트가능  포린키를 설정해준다. 개편함;; 자동
 	
-	@OneToMany(mappedBy="board",fetch=FetchType.EAGER)// one= board / many = reply ::mappedBy 연관관계의 주인이 아니다 DB에 column생성하지마라.    
+	@OneToMany(mappedBy="board",fetch=FetchType.EAGER,cascade = CascadeType.REMOVE)// one= board / many = reply ::mappedBy 연관관계의 주인이 아니다 DB에 column생성하지마라.    
 													// JoinColumn이 필요없는 것은 board는 replyid를 가지고 있을필요가없다 reply 가 boardid를 가지기때문에
 													// mappedBy="many쪽에 자신의 필드이름ex)board"
 													//FetchType.LAZY = 필요할때만 가져오는 방식  / EAGER = 무조곤사용할때 다가져오는방식 
+													// cascade = CascadeType.REMOVE reply table이 board table을 참조하고있어서 삭제시 관련 board정보를가진 reply 다삭제
+	@JsonIgnoreProperties("{board}") // reply가 user/board를가지고 있어서 무한참조가 일어나는데 걸어두면 안하게된다. : board 정보를가지고 오지 않는다.
+	@OrderBy("id desc") 	//오름차순 or내림차순 
 	private List<Reply> replys;	// 하나의 게시글엔 여러개의 댓글이 생길수 있다. 그래서 List를 사용
 	
 	@CreationTimestamp		// date 가 생성되거나 업뎃될때마다 들어간다

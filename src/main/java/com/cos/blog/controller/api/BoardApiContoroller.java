@@ -14,32 +14,52 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cos.blog.config.auth.PrincipalDetail;
+import com.cos.blog.dto.ReplySaveRequestDto;
 import com.cos.blog.dto.ResponseDto;
 import com.cos.blog.model.Board;
+import com.cos.blog.model.Reply;
 import com.cos.blog.model.RoleType;
 import com.cos.blog.model.User;
 import com.cos.blog.service.BoardService;
 import com.cos.blog.service.UserService;
 
-@RestController		// data 리턴
+@RestController // data 리턴
 public class BoardApiContoroller {
-	
+
 	@Autowired
 	private BoardService boardService;
 
 	@PostMapping("/api/board")
-	public ResponseDto<Integer> save(@RequestBody Board board,@AuthenticationPrincipal 	PrincipalDetail authenticationPrincipal) {
-		boardService.글저장(board,authenticationPrincipal.getUser());
-		return new ResponseDto<Integer>(HttpStatus.OK.value(),1);
+	public ResponseDto<Integer> save(@RequestBody Board board,
+			@AuthenticationPrincipal PrincipalDetail authenticationPrincipal) {
+		boardService.글저장(board, authenticationPrincipal.getUser());
+		return new ResponseDto<Integer>(HttpStatus.OK.value(), 1);
 	}
+
 	@DeleteMapping("/api/board/{id}")
-	public ResponseDto<Integer> deleteById(@PathVariable int id){
+	public ResponseDto<Integer> deleteById(@PathVariable int id) {
 		boardService.삭제하기(id);
-		return new ResponseDto<Integer>(HttpStatus.OK.value(),1); 	// http status 200
+		return new ResponseDto<Integer>(HttpStatus.OK.value(), 1); // http status 200
 	}
+
 	@PutMapping("/api/board/{id}")
-	public ResponseDto<Integer> update(@PathVariable int id, @RequestBody Board board){
-		boardService.글수정하기(id,board);
-		return new ResponseDto<Integer>(HttpStatus.OK.value(),1); 	// http status 200
+	public ResponseDto<Integer> update(@PathVariable int id, @RequestBody Board board) {
+		boardService.글수정하기(id, board);
+		return new ResponseDto<Integer>(HttpStatus.OK.value(), 1); // http status 200
+	}
+	// 데이터 받을 때 컨트롤러에서 DTO를 만들어서 받는게 좋다.
+	// dto를 사용하지 않은 이유는 작은 프로젝트라서 그냥 했었다 
+	// BUT 조금만 커져도  dto를 사용해야한다.
+	@PostMapping("/api/board/{boardId}/reply")
+	//public ResponseDto<Integer> save(@PathVariable int boardId, @RequestBody Reply reply, @AuthenticationPrincipal PrincipalDetail authenticationPrincipal) {
+	public ResponseDto<Integer> save(@RequestBody ReplySaveRequestDto replySaveRequestDto){
+			boardService.댓글쓰기(replySaveRequestDto);
+		return new ResponseDto<Integer>(HttpStatus.OK.value(), 1);
+	}
+	
+	@DeleteMapping("api/board/{boardId}/reply/{replyId}")
+	public ResponseDto<Integer> replyDelete(@PathVariable int replyId){
+		boardService.댓글삭제(replyId);
+		return new ResponseDto<Integer>(HttpStatus.OK.value(), 1);
 	}
 }
